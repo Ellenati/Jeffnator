@@ -11,10 +11,6 @@ class ResultScreen extends StatelessWidget {
     final guess = controller.finalGuess;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Resultado'),
-        automaticallyImplyLeading: false,
-      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -29,7 +25,11 @@ class ResultScreen extends StatelessWidget {
               Text(
                 guess?.name ?? 'Não consegui adivinhar! :(',
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue),
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
               ),
               const SizedBox(height: 40),
               if (guess != null) ...[
@@ -50,7 +50,11 @@ class ResultScreen extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Poxa, vou estudar mais! Obrigado por jogar.')),
+                          const SnackBar(
+                            content: Text(
+                              'Poxa, vou estudar mais! Obrigado por jogar.',
+                            ),
+                          ),
                         );
                       },
                       child: const Text('Não'),
