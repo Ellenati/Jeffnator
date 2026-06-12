@@ -3,9 +3,38 @@ import 'package:provider/provider.dart';
 import '../controllers/game_controller.dart';
 import 'question_screen.dart';
 import 'admin_questions_screen.dart';
+import '../widgets/custom_speech_bubble.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  void _showInstructions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.info_outline, color: Colors.blue),
+            SizedBox(width: 8),
+            Text('Como Jogar'),
+          ],
+        ),
+        content: const Text(
+          '1. Pense em um professor que já te deu aula.\n\n'
+          '2. O Jeffnator fará perguntas sobre as características e a didática desse professor.\n\n'
+          '3. Responda com sinceridade usando as opções fornecidas.\n\n'
+          '4. Divirta-se!',
+          style: TextStyle(fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Entendi!'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +47,10 @@ class HomeScreen extends StatelessWidget {
           alignment: Alignment.centerLeft,
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => _showInstructions(context),
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -70,26 +103,14 @@ class HomeScreen extends StatelessWidget {
                     // 2. TOP LAYER (Z-axis): The Speech Bubble
                     Positioned(
                       bottom: 30,
-                      left: 24,
-                      right: 24,
-                      child: CustomPaint(
-                        painter: SpeechBubblePainter(),
-                        child: const Padding(
-                          // Extra top padding ensures the text doesn't hit the drawn tail
-                          padding: EdgeInsets.only(
-                            top: 40.0,
-                            bottom: 24.0,
-                            left: 24.0,
-                            right: 24.0,
-                          ),
-                          child: Text(
-                            "Pense em um professor e eu vou tentar adivinhar!",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 600),
+                          child: CustomSpeechBubble(
+                            text: "Pense em um professor de TI e eu vou tentar adivinhar!",
+                            borderColor: Theme.of(context).primaryColor,
                           ),
                         ),
                       ),
@@ -100,25 +121,32 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
               // Start Button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {
-                  context.read<GameController>().startGame();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const QuestionScreen(),
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 0),
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  );
-                },
-                child: const Text(
-                  'Começar',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    onPressed: () {
+                      context.read<GameController>().startGame();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const QuestionScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Jogar',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 40),
@@ -128,63 +156,4 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class SpeechBubblePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.92)
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    const tailWidth = 24.0;
-    const tailHeight = 16.0;
-    const radius = 20.0;
-
-    // Start drawing from top-left, just below the tail height
-    path.moveTo(radius, tailHeight);
-
-    // Draw the tail pointing UP in the center
-    path.lineTo(size.width / 2 - tailWidth / 2, tailHeight);
-    path.lineTo(size.width / 2, 0);
-    path.lineTo(size.width / 2 + tailWidth / 2, tailHeight);
-
-    // Top-right corner
-    path.lineTo(size.width - radius, tailHeight);
-    path.quadraticBezierTo(
-      size.width,
-      tailHeight,
-      size.width,
-      tailHeight + radius,
-    );
-
-    // Bottom-right corner
-    path.lineTo(size.width, size.height - radius);
-    path.quadraticBezierTo(
-      size.width,
-      size.height,
-      size.width - radius,
-      size.height,
-    );
-
-    // Bottom-left corner
-    path.lineTo(radius, size.height);
-    path.quadraticBezierTo(0, size.height, 0, size.height - radius);
-
-    // Top-left corner
-    path.lineTo(0, tailHeight + radius);
-    path.quadraticBezierTo(0, tailHeight, radius, tailHeight);
-
-    path.close();
-
-    // Draw shadow (transparentOccluder: false prevents the shadow from rendering underneath the transparent bubble)
-    canvas.drawShadow(path, Colors.black, 10.0, false);
-
-    // Fill the shape
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

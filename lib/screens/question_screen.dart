@@ -7,6 +7,17 @@ import 'result_screen.dart';
 class QuestionScreen extends StatelessWidget {
   const QuestionScreen({super.key});
 
+  void _handleAnswer(BuildContext context, AnswerOption option) {
+    final controller = context.read<GameController>();
+    final gameEnded = controller.answerQuestion(option);
+    if (gameEnded) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ResultScreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<GameController>();
@@ -39,7 +50,7 @@ class QuestionScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         currentQuestion.text,
@@ -51,27 +62,43 @@ class QuestionScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 40),
-                      ...AnswerOption.values.map((option) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white.withOpacity(0.8),
-                              foregroundColor: Colors.black,
+                      ...AnswerOption.values.map((option) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: Center(
+                              child: ConstrainedBox(
+                                constraints:
+                                    const BoxConstraints(maxWidth: 400),
+                                child: SizedBox(
+                                  width:
+                                      double.infinity, // Fills the 400px constraint
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .primaryColor, // University's Maroon color
+                                      foregroundColor:
+                                          Colors.white, // White text for contrast
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical:
+                                              14), // Slightly smaller height
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      elevation: 4,
+                                    ),
+                                    onPressed: () =>
+                                        _handleAnswer(context, option),
+                                    child: Text(
+                                      option.label,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                            onPressed: () {
-                              final gameEnded = controller.answerQuestion(option);
-                              if (gameEnded) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const ResultScreen()),
-                                );
-                              }
-                            },
-                            child: Text(option.label),
-                          ),
-                        );
-                      }),
+                          )),
                     ],
                   ),
                 ),

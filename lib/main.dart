@@ -26,8 +26,18 @@ class AdivinhaProfApp extends StatelessWidget {
       title: 'Jeffnator',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6A152C),
+          primary: const Color(0xFF6A152C), // Explicitly enforcing the primary color
+        ),
         useMaterial3: true,
+        // Optional: Apply a clean global AppBar theme matching the new colors
+        appBarTheme: const AppBarTheme(
+          centerTitle: false,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          iconTheme: IconThemeData(color: Color(0xFF6A152C)),
+        ),
       ),
       home: const HomeScreen(),
     );
